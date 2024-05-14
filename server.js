@@ -1,6 +1,7 @@
+// import the http module
 const http = require('http');
 
-
+// create a jokes database of array objects
 let db = [
             {
                 "id": "0",
@@ -61,6 +62,8 @@ let db = [
   
 
 function requestHandler(req, res){
+
+    // handle get requests
     if (req.url === '/' && req.method === 'GET'){
 
         res.writeHead(200, {'Content-Type':'Application/Json'})
@@ -68,8 +71,48 @@ function requestHandler(req, res){
         res.end(JSON.stringify(db))
     }
     
+    // handle post requests
     if (req.url === '/' && req.method === 'POST'){
+
             let body = [];
+
+            // handle data stream event
+            req.on('data', (chunk) => {
+
+                // push chunks of binary data into body array
+                body.push(chunk)
+
+            })
+
+            // start a data stream event on the POST request
+            req.on('end', () => {
+
+                // at end of data stream event, convert concatenate binary data streams 
+                // and convert it to a string
+                let convertedBuffer = Buffer.concat(body).toString();
+
+                // parse the string data to JSON type for integration into the database
+                let jsonRes =JSON.parse(convertedBuffer)
+
+                //push the JSON data into the database to update it with a new entry as the new database
+                db.push(jsonRes)
+
+                // return a status code
+                res.writeHead(201)
+
+                //return the updated database as the response
+                res.end(JSON.stringify({'db': db}))
+            })
+
+    }
+
+    // handle patch request
+    if (req.url === '/joke/1' && req.method === 'PATCH') {
+
+        // get the id url parameter
+        const id = req.url.split('/')[2]
+
+        let body = [];
 
             req.on('data', (chunk) => {
 
@@ -81,18 +124,32 @@ function requestHandler(req, res){
 
                 let convertedBuffer = Buffer.concat(body).toString();
                 let jsonRes =JSON.parse(convertedBuffer)
-                db.push(jsonRes)
-                res.writeHead(201)
-                res.end(JSON.stringify({'db': db, "message":"database updated successfully"}))
-            })
 
+                // map data from request body to database item using the id and spread the data values into it
+                //using the spread operator `...`
+                let updateDB = db.map((item) => {
+                    if (item.id === id){
+                        return {
+                                    ...item,
+                                    ...jsonRes,
+                                }
+                    }
+
+                    return item
+                })
+
+                // update database with the new returned modified database entries
+                db = updateDB;
+
+                res.writeHead(201)
+
+                // return the updated database as a response
+                res.end(JSON.stringify(db))
+            })
+        
+        
     }
 }
-
-
-
-
-
 
 
 
