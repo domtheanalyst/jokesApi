@@ -3,62 +3,69 @@ const http = require('http');
 
 // create a jokes database of array objects
 let db = [
-            {
-                "id": "0",
-                "joke": "You are the ; to my statements",
-                "author": "Alice Johnson"
-            },
+    {
+        id: 0,
+        title: "You are the ; to my statements",
+        comedian: "Alice Johnson",
+        year: 2015
+    },
 
-            {
-                "id": "1",
-                "joke": "Why did the programmer quit her job? Because she didn’t get arrays",
-                "author": "Bob Smith"
-            },
+    {
+        id: 1,
+        title: "Why did the programmer quit her job? Because she didn’t get arrays",
+        comedian: "Bob Smith",
+        year: 2018
+    },
+    {
+        id: 2,
+        title: "What did the Java Code say to the C code? You’ve got no class",
+        comedian: "Charlie Brown",
+        year: 2020
+    },
 
-            {
-                "id": "2",
-                "joke": "What did the Java Code say to the C code? You’ve got no class",
-                "author": "Charlie Brown"
-            },
+    {
+        id: 3,
+        title: "A programmer puts two glasses on his bedside table before going to sleep. A full one, in case he gets thirsty, and an empty one, in case he doesn’t",
+        comedian: "Daisy Lee",
+        year: 2019
+    },
 
-            {
-                "id": "3",
-                "joke": "A programmer puts two glasses on his bedside table before going to sleep. A full one, in case he gets thirsty, and an empty one, in case he doesn’t",
-                "author": "Daisy Lee"
-            },
+    {
+        id: 4,
+        title: "Why do programmers prefer dark mode? Because light attracts bugs.",
+        comedian: "Eddie Rodriguez",
+        year: 2021
+    },
 
-            {
-                "id": "4",
-                "joke": "Why do programmers prefer dark mode? Because light attracts bugs.",
-                "author": "Eddie Rodriguez"
-            },
+    {
+        id: 5,
+        title: "Things aren’t always #000000 and #FFFFFF",
+        comedian: "Fiona Clark",
+        year: 2017
+    },
 
+    {
+        id: 6,
+        title: "Why do Java programmers have to wear glasses? Because they don’t C#",
+        comedian: "George Evans",
+        year: 2016
+    },
 
-            {
-                "id": "5",
-                "joke": "Things aren’t always #000000 and #FFFFFF",
-                "author": "Fiona Clark"
-            },
+    {
+        id: 7,
+        title: "A programmer is heading out to the grocery store, so his wife tells him “get a gallon of milk, and if they have eggs, get a dozen.” He returns with 13 gallons of milk.",
+        comedian: "Hannah Miller",
+        year: 2014
+    },
 
+    {
+        id: 8,
+        title: "Programmer: An organism that turns coffee into software",
+        comedian: "Ian Thompson",
+        year: 2013
+    }
+];
 
-            {
-                "id": "6",
-                "joke": "Why do Java programmers have to wear glasses? Because they don’t C#",
-                "author": "George Evans"
-            },
-
-            {
-                "id": "7",
-                "joke": "A programmer is heading out to the grocery store, so his wife tells him “get a gallon of milk, and if they have eggs, get a dozen.” He returns with 13 gallons of milk.",
-                "author": "Hannah Miller"
-            },
-
-            {
-                "id": "8",
-                "joke": "Programmer: An organism that turns coffee into software",
-                "author": "Ian Thompson"
-            }
-        ]
   
 
 function requestHandler(req, res){
@@ -110,7 +117,7 @@ function requestHandler(req, res){
     if (req.url === '/joke/1' && req.method === 'PATCH') {
 
         // get the id url parameter
-        const id = req.url.split('/')[2]
+        const id = +req.url.split('/')[2]
 
         let body = [];
 
@@ -135,7 +142,7 @@ function requestHandler(req, res){
                                 }
                     }
 
-                    return item
+                    return item;
                 })
 
                 // update database with the new returned modified database entries
@@ -144,11 +151,34 @@ function requestHandler(req, res){
                 res.writeHead(201)
 
                 // return the updated database as a response
-                res.end(JSON.stringify(db))
+                res.end(JSON.stringify(db));
             })
         
-        
     }
+
+    if (req.url === '/joke/1' && req.method === 'DELETE'){
+
+        const id = +req.url.split('/')[2];
+
+        const index = db.findIndex((item) => {
+            return item.id === id
+        });
+
+        if (index !== -1){
+            const deletedItem = db.splice(index, 1);
+
+            res.writeHead(200);
+
+            res.end(JSON.stringify(deletedItem));
+
+        } else {
+
+            res.writeHead(404, {'Content-Type': 'text/plain'})
+            res.end("Joke Not Found");
+        }
+
+    } 
+
 }
 
 
